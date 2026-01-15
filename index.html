@@ -1,0 +1,126 @@
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+export default function BirthdayNadia() {
+  const [code, setCode] = useState("");
+  const [unlocked, setUnlocked] = useState(false);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (unlocked) {
+      const audio = document.getElementById("bg-music");
+      audio.volume = 0;
+      audio.play().catch(() => {});
+      let v = 0;
+      const fade = setInterval(() => {
+        v += 0.02;
+        audio.volume = Math.min(v, 0.6);
+        if (v >= 0.6) clearInterval(fade);
+      }, 120);
+    }
+  }, [unlocked]);
+
+  const balloons = Array.from({ length: 7 });
+
+  const handleUnlock = () => {
+    if (code === "1501") {
+      setUnlocked(true);
+    } else {
+      setError(true);
+      setTimeout(() => setError(false), 600);
+    }
+  };
+
+  return (
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-rose-100 via-peach-100 to-amber-100 p-4">
+      {/* Floating Balloons */}
+      {balloons.map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute bottom-0 w-20 h-28 rounded-full bg-white/40 backdrop-blur shadow-lg"
+          style={{ left: `${8 + i * 12}%` }}
+          initial={{ y: 0, opacity: 0.6 }}
+          animate={{ y: -900 }}
+          transition={{ duration: 14 + i, repeat: Infinity, ease: "linear" }}
+        />
+      ))}
+
+      <AnimatePresence>
+        {!unlocked ? (
+          <motion.div
+            key="lock"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+          >
+            <Card className="rounded-2xl shadow-xl bg-white/90">
+              <CardContent className="p-8 text-center space-y-4">
+                <motion.h1
+                  animate={error ? { x: [-5, 5, -5, 5, 0] } : {}}
+                  className="text-2xl font-semibold"
+                >
+                  Enter Access Code
+                </motion.h1>
+                <input
+                  type="password"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  className="border rounded-xl px-4 py-2 text-center focus:outline-none"
+                  placeholder="****"
+                />
+                <Button className="rounded-xl" onClick={handleUnlock}>
+                  Unlock ✨
+                </Button>
+                {error && (
+                  <p className="text-sm text-rose-500">Incorrect code. Try again ✨</p>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="content"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="max-w-lg relative"
+          >
+            {/* Confetti */}
+            {[...Array(40)].map((_, i) => (
+              <motion.span
+                key={i}
+                className="absolute w-2 h-2 bg-rose-400 rounded-full"
+                initial={{ y: -20, x: Math.random() * 360 }}
+                animate={{ y: 700 }}
+                transition={{ duration: 3 + Math.random() * 2, repeat: Infinity }}
+              />
+            ))}
+
+            <Card className="rounded-2xl shadow-2xl bg-white/80 backdrop-blur">
+              <CardContent className="p-8 text-center space-y-6">
+                <img
+                  src="/nadia.png"
+                  alt="Nadia Chibi"
+                  className="mx-auto w-44 drop-shadow-2xl"
+                />
+                <h1 className="text-4xl font-bold text-rose-600">
+                  Happy Birthday Nadia 🎉
+                </h1>
+                <p className="text-gray-700 leading-relaxed">
+                  May your days be filled with laughter, success, and meaningful moments.
+                  Wishing you continuous growth, happiness, and beautiful memories ahead.
+                </p>
+                <p className="italic text-sm text-gray-500">
+                  With love & warm wishes 🤍
+                </p>
+              </CardContent>
+            </Card>
+
+            <audio id="bg-music" loop src="/music.mp3" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
