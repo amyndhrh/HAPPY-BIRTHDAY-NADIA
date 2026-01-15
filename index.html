@@ -64,11 +64,28 @@ export default function BirthdayNadia() {
                   Enter Access Code
                 </motion.h1>
                 <input
-                  type="password"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  className="border rounded-xl px-4 py-2 text-center focus:outline-none"
-                  placeholder="****"
+                  
+              <div className="flex justify-center gap-3">
+                {[0,1,2,3].map((i) => (
+                  <input
+                    key={i}
+                    type="password"
+                    maxLength={1}
+                    value={code[i] || ""}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      const newCode = code.split("");
+                      newCode[i] = val;
+                      setCode(newCode.join(""));
+                      if (val && e.target.nextSibling) {
+                        e.target.nextSibling.focus();
+                      }
+                    }}
+                    className="w-12 h-12 text-center text-xl font-semibold border rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-300"
+                  />
+                ))}
+              </div>
+
                 />
                 <Button className="rounded-xl" onClick={handleUnlock}>
                   Unlock ✨
